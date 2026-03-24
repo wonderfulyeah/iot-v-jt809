@@ -1,0 +1,4 @@
+# Default: Server Mode
+spring:
+  profiles:
+    active: server

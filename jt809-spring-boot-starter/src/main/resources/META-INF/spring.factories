@@ -1,0 +1,6 @@
+# Spring Boot Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.iot.v.jt809.starter.autoconfigure.JT809AutoConfiguration,\
+  org.iot.v.jt809.starter.autoconfigure.JT809ServerAutoConfiguration,\
+  org.iot.v.jt809.starter.autoconfigure.JT809ClientAutoConfiguration,\
+  org.iot.v.jt809.starter.autoconfigure.JT809HandlerAutoConfiguration

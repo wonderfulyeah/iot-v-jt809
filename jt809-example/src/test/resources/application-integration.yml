@@ -1,0 +1,29 @@
+# JT809 Integration Test Configuration
+# 集成测试配置 - 同时启动服务端和客户端
+
+spring:
+  profiles:
+    active: integration
+
+jt809:
+  enabled: true
+  mode: server
+  
+  server:
+    port: 19000
+    boss-threads: 1
+    worker-threads: 2
+    business-threads: 2
+    idle-timeout: 60
+    enable-log: true
+  
+  platforms:
+    - platform-id: 1000001
+      password: "123456"
+      version: "1.0"
+      enabled: true
+
+logging:
+  level:
+    org.iot.v.jt809: DEBUG
+    io.netty: INFO

@@ -1,0 +1,37 @@
+# JT809 Example - Client Mode Configuration
+# 作为下级平台，连接上级平台
+
+server:
+  port: 8080
+
+jt809:
+  enabled: true
+  mode: client
+  
+  # 客户端配置
+  client:
+    server-ip: 192.168.1.100        # 上级平台IP
+    server-port: 9000               # 上级平台端口
+    platform-id: 1000001            # 本平台ID
+    password: "123456"              # 接入密码
+    version: "1.0"                  # 协议版本
+    local-ip: 192.168.1.200         # 本地IP（可选）
+    local-port: 0                   # 本地端口（0表示随机）
+    
+    # 重连配置
+    reconnect:
+      enabled: true                 # 启用自动重连
+      interval: 5000                # 重连间隔(毫秒)
+      max-attempts: 10              # 最大重连次数
+      backoff-multiplier: 1.5       # 退避倍数
+    
+    # 心跳配置
+    heartbeat:
+      enabled: true                 # 启用心跳
+      interval: 60000               # 心跳间隔(毫秒)
+      timeout: 3                    # 超时次数
+
+logging:
+  level:
+    org.iot.v.jt809: DEBUG
+    io.netty: INFO

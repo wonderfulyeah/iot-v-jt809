@@ -1,0 +1,35 @@
+# JT809 Example - Server Mode Configuration
+# 作为上级平台，接收下级平台连接
+
+server:
+  port: 8080
+
+jt809:
+  enabled: true
+  mode: server
+  
+  # 服务端配置
+  server:
+    port: 9000                      # JT809监听端口
+    boss-threads: 1                 # Boss线程数
+    worker-threads: 8               # Worker线程数
+    business-threads: 8             # 业务线程数
+    idle-timeout: 180               # 空闲超时(秒)
+    enable-log: true                # 启用Netty日志
+  
+  # 授权的下级平台列表
+  platforms:
+    - platform-id: 1000001          # 平台ID
+      password: "123456"            # 接入密码
+      version: "1.0"                # 协议版本
+      enabled: true                 # 是否启用
+    
+    - platform-id: 1000002
+      password: "654321"
+      version: "1.0"
+      enabled: true
+
+logging:
+  level:
+    org.iot.v.jt809: DEBUG
+    io.netty: INFO
