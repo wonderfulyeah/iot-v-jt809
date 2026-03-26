@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.iot.v.jt809.core.codec.JT809Decoder;
 import org.iot.v.jt809.core.codec.JT809Encoder;
 import org.iot.v.jt809.core.session.SessionManager;
+import org.iot.v.jt809.handler.HandlerChain;
+import org.iot.v.jt809.handler.HandlerChainChannelHandler;
 import org.iot.v.jt809.server.config.ServerProperties;
 import org.iot.v.jt809.server.handler.ServerExceptionHandler;
 import org.iot.v.jt809.server.handler.ServerHandler;
@@ -35,6 +37,7 @@ public class JT809Server implements SmartLifecycle {
     private final ServerProperties config;
     private final ServerHandler serverHandler;
     private final SessionManager sessionManager;
+    private final HandlerChain handlerChain;
     
     // Netty组件
     private EventLoopGroup bossGroup;
@@ -46,9 +49,14 @@ public class JT809Server implements SmartLifecycle {
     private volatile boolean running = false;
     
     public JT809Server(ServerProperties config, SessionManager sessionManager) {
+        this(config, sessionManager, null);
+    }
+    
+    public JT809Server(ServerProperties config, SessionManager sessionManager, HandlerChain handlerChain) {
         this.config = config;
         this.sessionManager = sessionManager;
         this.serverHandler = new ServerHandler(config, sessionManager);
+        this.handlerChain = handlerChain;
     }
     
     /**
@@ -123,7 +131,14 @@ public class JT809Server implements SmartLifecycle {
         // 3. 业务处理器（使用业务线程池）
         pipeline.addLast(businessGroup, "serverHandler", serverHandler);
         
-        // 4. 空闲处理
+        // 4. 处理器链（如果有配置）
+        if (handlerChain != null && handlerChain.size() > 0) {
+            pipeline.addLast(businessGroup, "handlerChain", 
+                new HandlerChainChannelHandler(handlerChain, sessionManager));
+            log.info("HandlerChain added to pipeline with {} handlers", handlerChain.size());
+        }
+        
+        // 5. 空闲处理
         pipeline.addLast("idleHandler", new ServerIdleHandler());
         
         // 5. 异常处理

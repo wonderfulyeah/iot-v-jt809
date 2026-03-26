@@ -22,6 +22,12 @@
             <artifactId>jt809-core</artifactId>
         </dependency>
 
+        <!-- jt809-handler -->
+        <dependency>
+            <groupId>org.iot.v</groupId>
+            <artifactId>jt809-handler</artifactId>
+        </dependency>
+
         <!-- Spring Context -->
         <dependency>
             <groupId>org.springframework</groupId>
