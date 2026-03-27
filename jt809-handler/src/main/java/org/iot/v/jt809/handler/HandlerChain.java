@@ -35,6 +35,12 @@ public class HandlerChain {
             return;
         }
         
+        // 防止同一个处理器实例被多次添加
+        if (handlers.contains(handler)) {
+            log.debug("Handler {} already registered, skipping", handler.getName());
+            return;
+        }
+        
         handlers.add(handler);
         // 按顺序排序
         handlers.sort(Comparator.comparingInt(MessageHandler::getOrder));

@@ -30,8 +30,12 @@ public class HandlerChainChannelHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof BaseMessage) {
             BaseMessage message = (BaseMessage) msg;
             
+            // 从 SessionManager 获取当前连接的 Session
+            String sessionId = ctx.channel().id().asLongText();
+            org.iot.v.jt809.core.session.Session session = sessionManager.getSession(sessionId);
+            
             // 创建消息上下文
-            MessageContext context = new MessageContext(sessionManager, ctx.channel());
+            MessageContext context = new MessageContext(session, message);
             
             log.debug("HandlerChainChannelHandler processing message: msgId=0x{}", 
                 Integer.toHexString(message.getMsgId()));

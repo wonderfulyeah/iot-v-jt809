@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 处理器自动配置
@@ -27,9 +26,6 @@ public class JT809HandlerAutoConfiguration {
     
     @Autowired(required = false)
     private List<MessageHandler> handlers;
-    
-    @Autowired(required = false)
-    private Map<String, MessageHandler> handlerMap;
     
     /**
      * 日志拦截器
@@ -61,17 +57,9 @@ public class JT809HandlerAutoConfiguration {
         
         int registered = 0;
         
-        // 从List中注册
+        // 从List中注册（Spring会自动注入所有MessageHandler类型的bean）
         if (handlers != null) {
             for (MessageHandler handler : handlers) {
-                registerHandler(handlerChain, handler);
-                registered++;
-            }
-        }
-        
-        // 从Map中注册（处理通过@Bean方法注册的处理器）
-        if (handlerMap != null) {
-            for (MessageHandler handler : handlerMap.values()) {
                 registerHandler(handlerChain, handler);
                 registered++;
             }
