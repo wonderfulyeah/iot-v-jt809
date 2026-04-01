@@ -1,6 +1,7 @@
 package org.iot.v.jt809.core.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.iot.v.jt809.core.constant.JT809Constant;
@@ -12,6 +13,8 @@ import org.iot.v.jt809.core.util.SequenceGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,10 +106,18 @@ class JT809DecoderTest {
     @DisplayName("解码空数据")
     void testDecodeEmptyData() {
         ByteBuf buf = Unpooled.EMPTY_BUFFER;
-        
         channel.writeInbound(buf);
-        
         BaseMessage decoded = channel.readInbound();
         assertNull(decoded);
+    }
+
+
+    private String hex = "5B000000C9000006821700013415F4010000000000270F000000005E02A507B8D4C1413132333435000000000000000000000000000217010000008B01020304050607080910110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000E7D35D";
+    @Test
+    void decode() throws Exception {
+        ByteBuf buf = Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(hex));
+        channel.writeInbound(buf);
+        BaseMessage decoded = channel.readInbound();
+        assertNotNull(decoded);
     }
 }
