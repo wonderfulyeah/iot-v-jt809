@@ -3,6 +3,8 @@ package org.iot.v.jt809.core.message.base;
 import lombok.Data;
 import org.iot.v.jt809.core.constant.JT809Constant;
 
+import java.time.Instant;
+
 /**
  * 消息头
  *
@@ -53,4 +55,9 @@ public class MessageHead {
      * 加密密钥（不加密时为0）
      */
     private long encryptKey;
+
+    /**
+     * 消息时间
+     */
+    private Instant time;
 }
