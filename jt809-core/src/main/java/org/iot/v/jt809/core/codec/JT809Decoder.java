@@ -141,7 +141,7 @@ public class JT809Decoder extends ByteToMessageDecoder {
                     Integer.toHexString(head.getMsgId()), head.getMsgSn());
 
         } catch (Exception e) {
-            log.error("Decode message failed,raw data{}", rawData,e);
+            log.error("Decode message failed,raw data: {}", rawData, e);
         }
     }
 
