@@ -1,6 +1,7 @@
 package org.iot.v.jt809.core.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.iot.v.jt809.core.constant.JT809Constant;
@@ -9,10 +10,13 @@ import org.iot.v.jt809.core.message.base.MessageHead;
 import org.iot.v.jt809.core.message.base.ProtocolVersion;
 import org.iot.v.jt809.core.message.upstream.UpConnectReq;
 import org.iot.v.jt809.core.message.upstream.UpLinkTestReq;
+import org.iot.v.jt809.core.message.upstream.UpLinkTestResp;
 import org.iot.v.jt809.core.util.CRCUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -218,6 +222,42 @@ class JT809EncoderTest {
         // 总长度至少是最小消息长度
         assertTrue(encoded.readableBytes() >= JT809Constant.MIN_MESSAGE_LENGTH);
         
+        encoded.release();
+    }
+
+    @Test
+    @DisplayName("数据编码测试")
+    void testEncodedUpLinkTestRespMessage() {
+
+        UpLinkTestResp upLinkTestResp = new UpLinkTestResp();
+        MessageHead header = new MessageHead();
+        header.setMsgLength(0);
+        header.setMsgSn(40291);
+        header.setMsgId(4102);
+        header.setPlatformId(0);
+        header.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        header.setSuperPlatformId(0);
+        header.setEncrypt((byte) 0);
+        header.setEncryptKey(0);
+        header.setTime(Instant.now());
+
+        upLinkTestResp.setHead(header);
+        UpLinkTestResp.Body body = new UpLinkTestResp.Body();
+        body.setResult((byte) 0);
+
+        upLinkTestResp.setBody(body);
+
+        channel.writeOutbound(upLinkTestResp);
+        channel.finish();
+
+        ByteBuf encoded = channel.readOutbound();
+        System.out.printf("encoded:%s", ByteBufUtil.hexDump(encoded));
+
+        assertNotNull(encoded);
+
+        // 总长度至少是最小消息长度
+        assertTrue(encoded.readableBytes() >= JT809Constant.MIN_MESSAGE_LENGTH);
+
         encoded.release();
     }
 }
