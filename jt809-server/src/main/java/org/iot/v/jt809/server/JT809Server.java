@@ -11,7 +11,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.iot.v.jt809.core.codec.decoder.JT809ProtocolDecoder;
+import org.iot.v.jt809.core.codec.JT809Decoder;
 import org.iot.v.jt809.core.codec.JT809Encoder;
 import org.iot.v.jt809.core.session.SessionManager;
 import org.iot.v.jt809.handler.HandlerChain;
@@ -125,7 +125,7 @@ public class JT809Server implements SmartLifecycle {
             new IdleStateHandler(config.getIdleTimeout(), 0, 0, TimeUnit.SECONDS));
         
         // 2. 编解码器
-        pipeline.addLast("decoder", new JT809ProtocolDecoder());
+        pipeline.addLast("decoder", new JT809Decoder());
         pipeline.addLast("encoder", new JT809Encoder());
         
         // 3. 业务处理器（使用业务线程池）

@@ -15,10 +15,8 @@ import org.iot.v.jt809.client.config.ClientProperties;
 import org.iot.v.jt809.client.handler.ClientHandler;
 import org.iot.v.jt809.client.handler.HeartbeatHandler;
 import org.iot.v.jt809.client.handler.ReconnectHandler;
-import org.iot.v.jt809.core.codec.decoder.JT809ProtocolDecoder;
+import org.iot.v.jt809.core.codec.JT809Decoder;
 import org.iot.v.jt809.core.codec.JT809Encoder;
-import org.iot.v.jt809.core.codec.decoder.JT809DelimiterFrameDecoder;
-import org.iot.v.jt809.core.codec.decoder.JT809UnescapeDecoder;
 import org.iot.v.jt809.core.constant.SessionState;
 import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.upstream.UpConnectReq;
@@ -130,9 +128,7 @@ public class JT809Client implements SmartLifecycle {
             new IdleStateHandler(0, config.getHeartbeat().getInterval() / 1000, 0, TimeUnit.MILLISECONDS));
         
         // 2. 编解码器
-        pipeline.addLast("delimiterFrameDecoder",new JT809DelimiterFrameDecoder());
-        pipeline.addLast("unescapeDecoder",new JT809UnescapeDecoder());
-        pipeline.addLast("decoder", new JT809ProtocolDecoder());
+        pipeline.addLast("decoder", new JT809Decoder());
         pipeline.addLast("encoder", new JT809Encoder());
         
         // 3. 业务处理器（使用业务线程池）
