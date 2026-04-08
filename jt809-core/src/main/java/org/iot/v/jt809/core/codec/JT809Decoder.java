@@ -117,7 +117,13 @@ public class JT809Decoder extends ByteToMessageDecoder {
             MessageHead head = decodeHead(originalMessage);
 
             // 10. 根据消息ID创建对应的消息对象
-            BaseMessage message = MessageTypeRegistry.createMessage(head.getMsgId());
+            BaseMessage message;
+            try {
+                message = MessageTypeRegistry.createMessage(head.getMsgId());
+            } catch (IllegalArgumentException e) {
+                log.error("Unsupported Message Type", e);
+                return;
+            }
             message.setHead(head);
 
             // 11. 解码消息体
