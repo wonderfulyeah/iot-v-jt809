@@ -4,17 +4,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import org.iot.v.jt809.core.codec.decoder.JT809ProtocolDecoder;
 import org.iot.v.jt809.core.constant.JT809Constant;
-import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
-import org.iot.v.jt809.core.util.BCDUtil;
-import org.iot.v.jt809.core.util.CRCUtil;
 import org.iot.v.jt809.core.util.SequenceGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * @date 2026-03-24
  */
 @DisplayName("JT809解码器测试")
-class JT809DecoderTest {
+class JT809ProtocolDecoderTest {
 
     private EmbeddedChannel channel;
     private EscapeHandler escapeHandler;
 
     @BeforeEach
     void setUp() {
-        channel = new EmbeddedChannel(new JT809Decoder());
+        channel = new EmbeddedChannel(new JT809ProtocolDecoder());
         escapeHandler = new EscapeHandler();
     }
 
@@ -78,7 +74,7 @@ class JT809DecoderTest {
         // 创建包含编码器和解码器的通道
         EmbeddedChannel roundTripChannel = new EmbeddedChannel(
             new JT809Encoder(),
-            new JT809Decoder()
+            new JT809ProtocolDecoder()
         );
         
         // 创建测试消息
