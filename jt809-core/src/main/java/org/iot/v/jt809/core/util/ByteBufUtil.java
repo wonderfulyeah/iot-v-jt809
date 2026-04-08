@@ -75,6 +75,34 @@ public class ByteBufUtil {
         
         return bytes;
     }
+
+    /**
+     * 读取单字节
+     * @param buf ByteBuf
+     * @return 字节
+     */
+    public static byte readByte(ByteBuf buf){
+        return buf.readByte();
+    }
+
+    /**
+     * 读取字节数组
+     * @param buf ByteBuf
+     * @param length 读取长度
+     * @return 字节数组
+     */
+    public static byte[] readBytes(ByteBuf buf,int length){
+        return copyToArray(buf.readBytes(length));
+    }
+
+    public static int readUint16(ByteBuf buf){
+        return buf.readUnsignedShort();
+    }
+
+    public static long readUint32(ByteBuf buf){
+        return buf.readUnsignedInt();
+    }
+
     
     /**
      * 从ByteBuf读取固定长度字符串（去除尾部空字节）
@@ -95,6 +123,7 @@ public class ByteBufUtil {
         
         return new String(bytes, 0, end).trim();
     }
+
     
     /**
      * 将字符串写入ByteBuf（固定长度，不足补零）
