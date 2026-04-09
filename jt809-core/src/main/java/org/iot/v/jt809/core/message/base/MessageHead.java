@@ -30,7 +30,7 @@ public class MessageHead {
     private int msgId;
     
     /**
-     * 下级平台接入码（BCD码，8字节）
+     * 下级平台接入码（4字节 UINT32）
      */
     private long platformId;
     
@@ -38,11 +38,6 @@ public class MessageHead {
      * 协议版本号
      */
     private ProtocolVersion version = new ProtocolVersion();
-    
-    /**
-     * 上级平台接入码
-     */
-    private long superPlatformId;
     
     /**
      * 加密方式

@@ -10,6 +10,7 @@ import org.iot.v.jt809.core.constant.JT809Constant;
 import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.base.MessageHead;
 import org.iot.v.jt809.core.message.base.ProtocolVersion;
+import org.iot.v.jt809.core.util.BCDUtil;
 import org.iot.v.jt809.core.util.CRCUtil;
 
 import java.time.Instant;

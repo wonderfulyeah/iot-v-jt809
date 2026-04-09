@@ -13,6 +13,10 @@ import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.base.MessageHead;
 import org.iot.v.jt809.core.util.BCDUtil;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 /**
  * JT809消息编码器
  * 基于Netty的MessageToByteEncoder实现
@@ -143,35 +147,36 @@ public class JT809Encoder extends MessageToByteEncoder<BaseMessage> {
      * @return ByteBuf
      */
     private ByteBuf encodeHead(MessageHead head, int bodyLength) {
-        // 消息头总长度：消息长度(4) + 其他字段(25) = 29字节
-        ByteBuf buf = Unpooled.buffer(29);
+        // 消息头总长度：24字节
+        ByteBuf buf = Unpooled.buffer(JT809Constant.MESSAGE_HEAD_LENGTH);
 
-        // 消息长度 = 消息头(29) + 消息体长度 + CRC(2) +开始/结束标识（2）
-        // 注意：JT809协议中，消息长度字段的值包含自身
-        int msgLength = JT809Constant.MESSAGE_HEAD_LENGTH + bodyLength + JT809Constant.CRC_LENGTH +2;
+        // 消息长度 = 头标识(1) + 消息头(24) + 消息体长度 + CRC(2) + 尾标识(1)
+        int msgLength = 1 + JT809Constant.MESSAGE_HEAD_LENGTH + bodyLength + JT809Constant.CRC_LENGTH + 1;
         buf.writeInt(msgLength);
 
-        // 消息流水号
+        // 报文序列号 (4字节)
         buf.writeInt(head.getMsgSn());
 
-        // 消息ID
+        // 业务数据类型 (2字节)
         buf.writeShort(head.getMsgId());
 
-        // 下级平台接入码 (BCD码，8字节)
-        BCDUtil.writeLong(buf, head.getPlatformId(), 8);
+        // 下级平台接入码 (4字节 UINT32)
+        buf.writeInt((int) head.getPlatformId());
 
-        // 协议版本
+        // 协议版本号 (3字节)
         buf.writeByte(head.getVersion().getMajor());
         buf.writeByte(head.getVersion().getMinor());
+        buf.writeByte(0); // 第3字节保留为0
 
-        // 上级平台接入码
-        buf.writeInt((int) head.getSuperPlatformId());
-
-        // 加密方式
+        // 加密标识 (1字节)
         buf.writeByte(head.getEncrypt());
 
-        // 加密密钥
+        // 加密密钥 (4字节)
         buf.writeInt((int) head.getEncryptKey());
+
+        // 发送时间 (8字节)
+        Instant time = head.getTime() != null ? head.getTime() : Instant.now();
+        buf.writeLong(time.getEpochSecond());
 
         return buf;
     }

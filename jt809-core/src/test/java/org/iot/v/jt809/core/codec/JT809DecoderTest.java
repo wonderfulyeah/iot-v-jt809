@@ -112,7 +112,7 @@ class JT809DecoderTest {
     }
 
 
-    private String hex = "5b0000002200009d6310060000000000000000010000000000000000000000c1d85d";
+    private String hex = "5b000000270000002e10020000000001000000000000000000000069d739b9000000002fa2b45d";
     @Test
     @DisplayName("数据解码测试")
     void decode() throws Exception {

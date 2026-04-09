@@ -24,7 +24,6 @@ class MessageHeadTest {
         assertEquals(0, head.getMsgId());
         assertEquals(0, head.getPlatformId());
         assertNotNull(head.getVersion());
-        assertEquals(0, head.getSuperPlatformId());
         assertEquals(0, head.getEncrypt());
         assertEquals(0, head.getEncryptKey());
     }
@@ -78,15 +77,6 @@ class MessageHeadTest {
     }
 
     @Test
-    @DisplayName("设置和获取上级平台ID")
-    void testSuperPlatformId() {
-        MessageHead head = new MessageHead();
-        head.setSuperPlatformId(9999L);
-        
-        assertEquals(9999L, head.getSuperPlatformId());
-    }
-
-    @Test
     @DisplayName("设置和获取加密方式")
     void testEncrypt() {
         MessageHead head = new MessageHead();
@@ -120,5 +110,9 @@ class MessageHeadTest {
         head.setPlatformId(Long.MAX_VALUE);
         
         assertEquals(Long.MAX_VALUE, head.getPlatformId());
+    }
+
+    public static void main(String[] args) {
+        System.out.println("5b00000021000000000000000000000100000000000000260408175217000000002fff2b5d".length());
     }
 }
