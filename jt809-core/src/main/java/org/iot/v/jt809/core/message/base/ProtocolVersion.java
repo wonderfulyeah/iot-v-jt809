@@ -14,26 +14,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProtocolVersion {
-    
+
     /**
      * 主版本号
      */
     private byte major = 1;
-    
+
     /**
      * 次版本号
      */
     private byte minor = 0;
-    
+
+    private byte revision = 0;
+
     /**
      * 获取版本字符串
      *
      * @return 版本字符串（如 "1.0"）
      */
     public String getVersion() {
-        return major + "." + minor;
+        return major + "." + minor + "." + revision;
     }
-    
+
     /**
      * 解析版本字符串
      *
@@ -41,21 +43,25 @@ public class ProtocolVersion {
      * @return ProtocolVersion对象
      */
     public static ProtocolVersion parse(String version) {
+        ProtocolVersion protocolVersion = new ProtocolVersion();
         if (version == null || version.isEmpty()) {
-            return new ProtocolVersion();
+            return protocolVersion;
         }
-        
+
         String[] parts = version.split("\\.");
-        if (parts.length == 2) {
-            try {
-                byte major = Byte.parseByte(parts[0]);
-                byte minor = Byte.parseByte(parts[1]);
-                return new ProtocolVersion(major, minor);
-            } catch (NumberFormatException e) {
-                return new ProtocolVersion();
-            }
+
+        if(parts.length > 0){
+            protocolVersion.setMajor(Byte.parseByte(parts[0]));
         }
-        
-        return new ProtocolVersion();
+
+        if(parts.length > 1){
+            protocolVersion.setMinor(Byte.parseByte(parts[1]));
+        }
+
+        if(parts.length > 2){
+            protocolVersion.setRevision(Byte.parseByte(parts[2]));
+        }
+
+        return protocolVersion;
     }
 }

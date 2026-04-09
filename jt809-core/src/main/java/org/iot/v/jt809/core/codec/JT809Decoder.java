@@ -32,6 +32,7 @@ public class JT809Decoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         String rawData = ByteBufUtil.hexDump(in);
+        log.info("receive data:{}", rawData);
         try {
             // 1. 检查可读字节数
             if (in.readableBytes() < JT809Constant.MIN_MESSAGE_LENGTH) {
@@ -204,9 +205,8 @@ public class JT809Decoder extends ByteToMessageDecoder {
         head.setPlatformId(buf.readUnsignedInt());
 
         // 协议版本
-        head.setVersion(new ProtocolVersion(buf.readByte(), buf.readByte()));
-        // 调过修正版本号
-        buf.readByte();
+        head.setVersion(new ProtocolVersion(buf.readByte(), buf.readByte(), buf.readByte()));
+
         // 上级平台接入码
 //        head.setSuperPlatformId(buf.readUnsignedInt());
 
