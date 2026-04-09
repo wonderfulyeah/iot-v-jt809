@@ -68,7 +68,7 @@ class MessageHeadTest {
     @DisplayName("设置和获取协议版本")
     void testVersion() {
         MessageHead head = new MessageHead();
-        ProtocolVersion version = new ProtocolVersion((byte) 2, (byte) 0);
+        ProtocolVersion version = new ProtocolVersion((byte) 2, (byte) 0, (byte) 0);
         head.setVersion(version);
         
         assertEquals(version, head.getVersion());

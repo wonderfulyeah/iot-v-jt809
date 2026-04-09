@@ -47,7 +47,7 @@ class JT809EncoderTest {
         MessageHead head = msg.getHead();
         head.setMsgSn(1);
         head.setPlatformId(1000001L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -77,7 +77,7 @@ class JT809EncoderTest {
         MessageHead head = msg.getHead();
         head.setMsgSn(1);
         head.setPlatformId(1000001L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -101,7 +101,7 @@ class JT809EncoderTest {
         UpConnectReq msg = new UpConnectReq();
         MessageHead head = msg.getHead();
         head.setPlatformId(1000001L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -127,7 +127,7 @@ class JT809EncoderTest {
         MessageHead head = msg.getHead();
         head.setMsgSn(12345);
         head.setPlatformId(12345678L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -161,7 +161,7 @@ class JT809EncoderTest {
         UpLinkTestReq msg = new UpLinkTestReq();
         MessageHead head = msg.getHead();
         head.setPlatformId(1000001L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -199,7 +199,7 @@ class JT809EncoderTest {
         UpConnectReq msg = new UpConnectReq();
         MessageHead head = msg.getHead();
         head.setPlatformId(1000001L);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0L);
 
@@ -230,7 +230,7 @@ class JT809EncoderTest {
         head.setMsgSn(46);
         head.setMsgId(4098);
         head.setPlatformId(0);
-        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0));
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
         head.setEncrypt((byte) 0);
         head.setEncryptKey(0);
         head.setTime(Instant.now());

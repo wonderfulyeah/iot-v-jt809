@@ -26,7 +26,7 @@ class ProtocolVersionTest {
     @Test
     @DisplayName("创建指定版本")
     void testCreateWithVersion() {
-        ProtocolVersion version = new ProtocolVersion((byte) 2, (byte) 5);
+        ProtocolVersion version = new ProtocolVersion((byte) 2, (byte) 5, (byte) 0);
         
         assertEquals(2, version.getMajor());
         assertEquals(5, version.getMinor());
@@ -35,7 +35,7 @@ class ProtocolVersionTest {
     @Test
     @DisplayName("获取版本字符串")
     void testGetVersion() {
-        ProtocolVersion version = new ProtocolVersion((byte) 1, (byte) 0);
+        ProtocolVersion version = new ProtocolVersion((byte) 1, (byte) 0, (byte) 0);
         
         assertEquals("1.0", version.getVersion());
     }
@@ -90,9 +90,9 @@ class ProtocolVersionTest {
     @Test
     @DisplayName("版本相等性比较")
     void testEquals() {
-        ProtocolVersion v1 = new ProtocolVersion((byte) 1, (byte) 0);
-        ProtocolVersion v2 = new ProtocolVersion((byte) 1, (byte) 0);
-        ProtocolVersion v3 = new ProtocolVersion((byte) 2, (byte) 0);
+        ProtocolVersion v1 = new ProtocolVersion((byte) 1, (byte) 0, (byte) 0);
+        ProtocolVersion v2 = new ProtocolVersion((byte) 1, (byte) 0, (byte) 0);
+        ProtocolVersion v3 = new ProtocolVersion((byte) 2, (byte) 0, (byte) 0);
         
         assertEquals(v1, v2);
         assertNotEquals(v1, v3);
@@ -101,8 +101,8 @@ class ProtocolVersionTest {
     @Test
     @DisplayName("版本哈希码")
     void testHashCode() {
-        ProtocolVersion v1 = new ProtocolVersion((byte) 1, (byte) 0);
-        ProtocolVersion v2 = new ProtocolVersion((byte) 1, (byte) 0);
+        ProtocolVersion v1 = new ProtocolVersion((byte) 1, (byte) 0, (byte) 0);
+        ProtocolVersion v2 = new ProtocolVersion((byte) 1, (byte) 0, (byte) 0);
         
         assertEquals(v1.hashCode(), v2.hashCode());
     }
