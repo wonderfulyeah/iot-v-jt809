@@ -3,6 +3,9 @@ package org.iot.v.jt809.core.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * ByteBuf工具类
  *
@@ -92,8 +95,7 @@ public class ByteBufUtil {
         while (end > 0 && bytes[end - 1] == 0) {
             end--;
         }
-        
-        return new String(bytes, 0, end).trim();
+        return new String(bytes, 0, end, Charset.forName("GBK")).trim();
     }
     
     /**
