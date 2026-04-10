@@ -6,12 +6,11 @@ import org.iot.v.jt809.client.config.ClientProperties;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.upstream.vehicle.VehicleAlarmMsg;
-import org.iot.v.jt809.core.message.upstream.vehicle.VehicleLocationMsg;
+import org.iot.v.jt809.core.message.upstream.vehicle.VehicleDynamicMsg;
 import org.iot.v.jt809.core.session.Session;
 import org.iot.v.jt809.core.session.SessionManager;
 import org.iot.v.jt809.server.JT809Server;
 import org.iot.v.jt809.server.config.ServerProperties;
-import org.iot.v.jt809.server.handler.ServerHandler;
 import org.junit.jupiter.api.*;
 
 import java.time.Instant;
@@ -64,11 +63,11 @@ class JT809IntegrationTest {
                 count, Integer.toHexString(message.getMsgId()), message.getMessageTypeName());
             
             // 打印详细信息
-            if (message instanceof VehicleLocationMsg) {
-                VehicleLocationMsg locationMsg = (VehicleLocationMsg) message;
-                VehicleLocationMsg.Body body = (VehicleLocationMsg.Body) locationMsg.getBody();
+            if (message instanceof VehicleDynamicMsg) {
+                VehicleDynamicMsg locationMsg = (VehicleDynamicMsg) message;
+                VehicleDynamicMsg.Body body = (VehicleDynamicMsg.Body) locationMsg.getBody();
                 if (body != null && body.getLocationData() != null) {
-                    VehicleLocationMsg.LocationData loc = body.getLocationData();
+                    VehicleDynamicMsg.LocationData loc = body.getLocationData();
                     log.info("[服务端] 车辆定位: 车牌={}, 经度={}, 纬度={}, 速度={}km/h", 
                         body.getVehicleNo(),
                         loc.getLongitude() / 1_000_000.0,
@@ -216,7 +215,7 @@ class JT809IntegrationTest {
         messageReceivedCount.set(0);
         
         // 创建车辆定位消息
-        VehicleLocationMsg message = createVehicleLocationMessage();
+        VehicleDynamicMsg message = createVehicleLocationMessage();
         
         log.info("[客户端] 发送车辆定位消息...");
         client.send(message);
@@ -249,9 +248,9 @@ class JT809IntegrationTest {
         log.info("[客户端] 批量发送 {} 条消息...", messageCount);
         
         for (int i = 0; i < messageCount; i++) {
-            VehicleLocationMsg message = createVehicleLocationMessage();
+            VehicleDynamicMsg message = createVehicleLocationMessage();
             // 修改车牌号区分每条消息
-            VehicleLocationMsg.Body body = (VehicleLocationMsg.Body) message.getBody();
+            VehicleDynamicMsg.Body body = (VehicleDynamicMsg.Body) message.getBody();
             body.setVehicleNo(String.format("京A%05d", i + 1));
             client.send(message);
             
@@ -291,8 +290,8 @@ class JT809IntegrationTest {
                 try {
                     startLatch.await();
                     for (int i = 0; i < messagesPerThread; i++) {
-                        VehicleLocationMsg message = createVehicleLocationMessage();
-                        VehicleLocationMsg.Body body = (VehicleLocationMsg.Body) message.getBody();
+                        VehicleDynamicMsg message = createVehicleLocationMessage();
+                        VehicleDynamicMsg.Body body = (VehicleDynamicMsg.Body) message.getBody();
                         body.setVehicleNo(String.format("京B%d%02d", threadIndex, i));
                         client.send(message);
                         TimeUnit.MILLISECONDS.sleep(50);
@@ -399,9 +398,9 @@ class JT809IntegrationTest {
     /**
      * 创建车辆定位消息
      */
-    private VehicleLocationMsg createVehicleLocationMessage() {
-        VehicleLocationMsg message = new VehicleLocationMsg();
-        VehicleLocationMsg.Body body = new VehicleLocationMsg.Body();
+    private VehicleDynamicMsg createVehicleLocationMessage() {
+        VehicleDynamicMsg message = new VehicleDynamicMsg();
+        VehicleDynamicMsg.Body body = new VehicleDynamicMsg.Body();
         
         // 车牌号
         body.setVehicleNo("京A12345");
@@ -411,7 +410,7 @@ class JT809IntegrationTest {
         body.setSubBusinessType(0x1202);
         
         // 创建定位数据
-        VehicleLocationMsg.LocationData locationData = new VehicleLocationMsg.LocationData();
+        VehicleDynamicMsg.LocationData locationData = new VehicleDynamicMsg.LocationData();
         
         // 时间 (BCD格式: YYMMDDHHmmss)
         java.time.LocalDateTime now = java.time.LocalDateTime.now();

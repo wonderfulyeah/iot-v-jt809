@@ -34,7 +34,7 @@ public class MessageTypeRegistry {
         register(MessageType.UP_LINK_TEST_RESP, UpLinkTestResp.class);
         
         // 注册上行车辆消息
-        register(MessageType.VEHICLE_LOCATION, VehicleLocationMsg.class);
+        register(MessageType.VEHICLE_LOCATION, VehicleDynamicMsg.class);
         register(MessageType.VEHICLE_ALARM, VehicleAlarmMsg.class);
         register(MessageType.VEHICLE_REGISTER, VehicleRegisterMsg.class);
         

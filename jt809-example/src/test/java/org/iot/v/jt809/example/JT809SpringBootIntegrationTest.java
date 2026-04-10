@@ -6,7 +6,7 @@ import org.iot.v.jt809.client.config.ClientProperties;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.upstream.vehicle.VehicleAlarmMsg;
-import org.iot.v.jt809.core.message.upstream.vehicle.VehicleLocationMsg;
+import org.iot.v.jt809.core.message.upstream.vehicle.VehicleDynamicMsg;
 import org.iot.v.jt809.core.session.Session;
 import org.iot.v.jt809.core.session.SessionManager;
 import org.iot.v.jt809.handler.HandlerChain;
@@ -97,8 +97,8 @@ class JT809SpringBootIntegrationTest {
             int count = locationMessageCount.incrementAndGet();
             lastLocationMessage.set(message);
             
-            VehicleLocationMsg locationMsg = (VehicleLocationMsg) message;
-            VehicleLocationMsg.Body body = (VehicleLocationMsg.Body) locationMsg.getBody();
+            VehicleDynamicMsg locationMsg = (VehicleDynamicMsg) message;
+            VehicleDynamicMsg.Body body = (VehicleDynamicMsg.Body) locationMsg.getBody();
             
             log.info("[TestLocationHandler] 处理车辆定位消息 #{}: 车牌={}, msgId=0x{}",
                 count, 
@@ -226,7 +226,7 @@ class JT809SpringBootIntegrationTest {
         locationMessageCount.set(0);
 
         // 创建车辆定位消息
-        VehicleLocationMsg message = createVehicleLocationMessage();
+        VehicleDynamicMsg message = createVehicleLocationMessage();
 
         log.info("[客户端] 发送车辆定位消息...");
         client.send(message);
@@ -310,15 +310,15 @@ class JT809SpringBootIntegrationTest {
     /**
      * 创建车辆定位消息
      */
-    private VehicleLocationMsg createVehicleLocationMessage() {
-        VehicleLocationMsg message = new VehicleLocationMsg();
-        VehicleLocationMsg.Body body = new VehicleLocationMsg.Body();
+    private VehicleDynamicMsg createVehicleLocationMessage() {
+        VehicleDynamicMsg message = new VehicleDynamicMsg();
+        VehicleDynamicMsg.Body body = new VehicleDynamicMsg.Body();
 
         body.setVehicleNo("京A12345");
         body.setVehicleColor(1);
         body.setSubBusinessType(0x1202);
 
-        VehicleLocationMsg.LocationData locationData = new VehicleLocationMsg.LocationData();
+        VehicleDynamicMsg.LocationData locationData = new VehicleDynamicMsg.LocationData();
 
         LocalDateTime now = LocalDateTime.now();
         locationData.setTime(String.format("%02d%02d%02d%02d%02d%02d",
