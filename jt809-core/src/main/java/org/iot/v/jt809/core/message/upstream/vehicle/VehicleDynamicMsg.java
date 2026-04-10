@@ -73,7 +73,12 @@ public class VehicleDynamicMsg extends BaseMessage {
         private LocationData locationData;
         
         /**
-         * 1203特有数据：车辆定位信息自动补报数据
+         * 1202：实时上传车辆定位信息（单条）
+         */
+        private VehicleLocationInfo2019 vehicleLocationInfo2019;
+        
+        /**
+         * 1203特有数据：车辆定位信息自动补报数据（多条）
          */
         private LocationSupplementData locationSupplementData;
         
@@ -83,6 +88,8 @@ public class VehicleDynamicMsg extends BaseMessage {
             
             if (subBusinessType == SUB_BUSINESS_TYPE_1203 && locationSupplementData != null) {
                 dataBytes = locationSupplementData.encode();
+            } else if (subBusinessType == SUB_BUSINESS_TYPE_1202 && vehicleLocationInfo2019 != null) {
+                dataBytes = vehicleLocationInfo2019.encode();
             } else if (locationData != null) {
                 dataBytes = locationData.encode();
             } else {
@@ -141,6 +148,9 @@ public class VehicleDynamicMsg extends BaseMessage {
                 if (subBusinessType == SUB_BUSINESS_TYPE_1203) {
                     locationSupplementData = new LocationSupplementData();
                     locationSupplementData.decode(dataBytes);
+                } else if (subBusinessType == SUB_BUSINESS_TYPE_1202) {
+                    vehicleLocationInfo2019 = new VehicleLocationInfo2019();
+                    vehicleLocationInfo2019.decode(Unpooled.wrappedBuffer(dataBytes));
                 } else {
                     locationData = new LocationData();
                     locationData.decode(dataBytes);
