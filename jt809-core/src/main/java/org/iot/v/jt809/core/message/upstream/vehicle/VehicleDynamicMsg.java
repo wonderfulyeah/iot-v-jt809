@@ -27,8 +27,9 @@ public class VehicleDynamicMsg extends BaseMessage {
     /**
      * 子业务类型标识：车辆定位信息自动补报请求消息
      */
-    public static final int SUB_BUSINESS_TYPE_1203 = 0x1203;
+    public static final int SUB_BUSINESS_TYPE_1201 = 0x1201;
     public static final int SUB_BUSINESS_TYPE_1202 = 0x1202;
+    public static final int SUB_BUSINESS_TYPE_1203 = 0x1203;
 
     public VehicleDynamicMsg() {
         setMsgId(MessageType.VEHICLE_LOCATION);
@@ -82,6 +83,11 @@ public class VehicleDynamicMsg extends BaseMessage {
          */
         private LocationSupplementData locationSupplementData;
         
+        /**
+         * 1201：上传车辆注册信息
+         */
+        private VehicleRegistrationData vehicleRegistrationData;
+        
         @Override
         public byte[] encode() {
             byte[] dataBytes;
@@ -90,6 +96,8 @@ public class VehicleDynamicMsg extends BaseMessage {
                 dataBytes = locationSupplementData.encode();
             } else if (subBusinessType == SUB_BUSINESS_TYPE_1202 && vehicleLocationInfo2019 != null) {
                 dataBytes = vehicleLocationInfo2019.encode();
+            } else if (subBusinessType == SUB_BUSINESS_TYPE_1201 && vehicleRegistrationData != null) {
+                dataBytes = vehicleRegistrationData.encode();
             } else if (locationData != null) {
                 dataBytes = locationData.encode();
             } else {
@@ -151,6 +159,9 @@ public class VehicleDynamicMsg extends BaseMessage {
                 } else if (subBusinessType == SUB_BUSINESS_TYPE_1202) {
                     vehicleLocationInfo2019 = new VehicleLocationInfo2019();
                     vehicleLocationInfo2019.decode(Unpooled.wrappedBuffer(dataBytes));
+                } else if (subBusinessType == SUB_BUSINESS_TYPE_1201) {
+                    vehicleRegistrationData = new VehicleRegistrationData();
+                    vehicleRegistrationData.decode(dataBytes);
                 } else {
                     locationData = new LocationData();
                     locationData.decode(dataBytes);
@@ -1145,6 +1156,95 @@ public class VehicleDynamicMsg extends BaseMessage {
             }
             
             return true;
+        }
+    }
+    
+    /**
+     * 1201：上传车辆注册信息
+     */
+    @Data
+    public static class VehicleRegistrationData {
+        
+        /**
+         * 平台唯一编码（20字节）
+         */
+        private String platformId;
+        
+        /**
+         * 车载终端厂商唯一编码（20字节）
+         */
+        private String terminalManufacturerId;
+        
+        /**
+         * 车载终端型号（40字节）
+         */
+        private String terminalModel;
+        
+        /**
+         * 车载终端通讯模块IMEI码（20字节）
+         */
+        private String terminalImei;
+        
+        /**
+         * 车载终端编号（20字节）
+         */
+        private String terminalId;
+        
+        /**
+         * 车载终端（10字节）
+         */
+        private String terminalSimNumber;
+        
+        public byte[] encode() {
+            ByteBuf buf = Unpooled.buffer(130);
+            
+            // 平台唯一编码 (20字节)
+            ByteBufUtil.writeString(buf, platformId, 20);
+            
+            // 车载终端厂商唯一编码 (20字节)
+            ByteBufUtil.writeString(buf, terminalManufacturerId, 20);
+            
+            // 车载终端型号 (40字节)
+            ByteBufUtil.writeString(buf, terminalModel, 40);
+            
+            // 车载终端通讯模块IMEI码 (20字节)
+            ByteBufUtil.writeString(buf, terminalImei, 20);
+            
+            // 车载终端编号 (20字节)
+            ByteBufUtil.writeString(buf, terminalId, 20);
+            
+            // 车载终端 (10字节)
+            ByteBufUtil.writeString(buf, terminalSimNumber, 10);
+            
+            byte[] result = new byte[buf.readableBytes()];
+            buf.readBytes(result);
+            buf.release();
+            
+            return result;
+        }
+        
+        public void decode(byte[] data) {
+            ByteBuf buf = Unpooled.wrappedBuffer(data);
+            
+            // 平台唯一编码 (20字节)
+            platformId = ByteBufUtil.readString(buf, 11);
+            
+            // 车载终端厂商唯一编码 (20字节)
+            terminalManufacturerId = ByteBufUtil.readString(buf, 11);
+            
+            // 车载终端型号 (40字节)
+            terminalModel = ByteBufUtil.readString(buf, 30);
+            
+            // 车载终端通讯模块IMEI码 (20字节)
+            terminalImei = ByteBufUtil.readString(buf, 15);
+            
+            // 车载终端编号 (20字节)
+            terminalId = ByteBufUtil.readString(buf, 30);
+            
+            // 车载终端 (10字节)
+            terminalSimNumber = ByteBufUtil.readString(buf, 13);
+            
+            buf.release();
         }
     }
 }
