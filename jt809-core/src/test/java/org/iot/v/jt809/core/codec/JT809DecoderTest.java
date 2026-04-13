@@ -7,6 +7,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.iot.v.jt809.core.constant.JT809Constant;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
+import org.iot.v.jt809.core.message.upstream.vehicle.AlarmInfoMsg;
 import org.iot.v.jt809.core.util.BCDUtil;
 import org.iot.v.jt809.core.util.CRCUtil;
 import org.iot.v.jt809.core.util.SequenceGenerator;
@@ -135,6 +136,16 @@ class JT809DecoderTest {
     @DisplayName("数据解码测试1201")
     void decode1201() throws Exception {
         String hex = "5b000000ac0001972c1200000f424401000100000000000000000069d77403b4a8534431393932320000000000000000000000005e0212010000006e3335303130323130313738000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000035313435313238000000000000000000000000000000000000000000000030303431353235313435313238355a015d";
+        ByteBuf buf = Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(hex));
+        channel.writeInbound(buf);
+        BaseMessage decoded = channel.readInbound();
+        assertNotNull(decoded);
+    }
+
+    @Test
+    @DisplayName("数据解码测试1402")
+    void decode1402() throws Exception {
+        String hex = "5b0000007e000000ca1400000f424501000100000000000000000069d8ae82140200000056333530313032313031373800010000000069d8ae360000000069d8ae360000000069d8ae3fb4a8534735303038000000000000000000000000000233353031303231303137380000000000000008b3accbd9b1a8beaf22d95d";
         ByteBuf buf = Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(hex));
         channel.writeInbound(buf);
         BaseMessage decoded = channel.readInbound();

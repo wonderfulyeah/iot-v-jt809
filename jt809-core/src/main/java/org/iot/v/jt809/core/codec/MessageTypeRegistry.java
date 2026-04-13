@@ -35,8 +35,8 @@ public class MessageTypeRegistry {
         
         // 注册上行车辆消息
         register(MessageType.VEHICLE_LOCATION, VehicleDynamicMsg.class);
-        register(MessageType.VEHICLE_ALARM, VehicleAlarmMsg.class);
         register(MessageType.VEHICLE_REGISTER, VehicleRegisterMsg.class);
+        register(MessageType.ALARM_INFO_INTERACTION, AlarmInfoMsg.class);
         
         // 注册下行消息
         register(MessageType.DOWN_CONNECT_REQ, DownConnectReq.class);

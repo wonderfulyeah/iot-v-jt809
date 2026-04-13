@@ -5,7 +5,6 @@ import org.iot.v.jt809.client.JT809Client;
 import org.iot.v.jt809.client.config.ClientProperties;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
-import org.iot.v.jt809.core.message.upstream.vehicle.VehicleAlarmMsg;
 import org.iot.v.jt809.core.message.upstream.vehicle.VehicleDynamicMsg;
 import org.iot.v.jt809.core.session.Session;
 import org.iot.v.jt809.core.session.SessionManager;

@@ -51,6 +51,11 @@ public interface MessageType {
     int VEHICLE_LOCATION_DATA = 0x1202;
     
     /**
+     * 主链路报警信息交互消息
+     */
+    int ALARM_INFO_INTERACTION = 0x1400;
+    
+    /**
      * 车辆报警信息
      */
     int VEHICLE_ALARM = 0x1401;
