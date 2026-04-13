@@ -6,6 +6,7 @@ import org.iot.v.jt809.client.config.ClientProperties;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
 import org.iot.v.jt809.core.message.upstream.vehicle.VehicleDynamicMsg;
+import org.iot.v.jt809.core.message.upstream.vehicle.AlarmInfoMsg;
 import org.iot.v.jt809.core.session.Session;
 import org.iot.v.jt809.core.session.SessionManager;
 import org.iot.v.jt809.server.JT809Server;
@@ -73,17 +74,17 @@ class JT809IntegrationTest {
                         loc.getLatitude() / 1_000_000.0,
                         loc.getSpeed() / 10.0);
                 }
-            } else if (message instanceof VehicleAlarmMsg) {
-                VehicleAlarmMsg alarmMsg = (VehicleAlarmMsg) message;
-                VehicleAlarmMsg.Body body = (VehicleAlarmMsg.Body) alarmMsg.getBody();
-                if (body != null && body.getAlarmData() != null) {
-                    VehicleAlarmMsg.AlarmData alarm = body.getAlarmData();
-                    log.info("[服务端] 车辆报警: 车牌={}, 报警类型={}, 报警来源={}, 经度={}, 纬度={}", 
-                        body.getVehicleNo(),
-                        alarm.getAlarmType(),
-                        alarm.getAlarmSource(),
-                        alarm.getLongitude() / 1_000_000.0,
-                        alarm.getLatitude() / 1_000_000.0);
+            } else if (message instanceof AlarmInfoMsg) {
+                AlarmInfoMsg alarmInfoMsg = (AlarmInfoMsg) message;
+                AlarmInfoMsg.Body body = (AlarmInfoMsg.Body) alarmInfoMsg.getBody();
+                if (body != null && body.getAlarmReportData() != null) {
+                    AlarmInfoMsg.AlarmReportData data = body.getAlarmReportData();
+                    log.info("[服务端] 报警信息: 子业务类型=0x{}, 平台编码={}, 报警类型={}, 车牌={}, 信息内容={}", 
+                        Integer.toHexString(body.getSubBusinessType()),
+                        data.getSourcePlatformId(),
+                        data.getAlarmType(),
+                        data.getVehicleNo(),
+                        data.getInfoContent());
                 }
             }
         });
@@ -322,15 +323,15 @@ class JT809IntegrationTest {
     
     @Test
     @Order(9)
-    @DisplayName("发送车辆报警消息测试")
-    void testSendVehicleAlarmMessage() throws Exception {
+    @DisplayName("发送报警信息消息测试(1402)")
+    void testSendAlarmInfoMessage() throws Exception {
         // 重置计数器
         messageReceivedCount.set(0);
         
-        // 创建车辆报警消息
-        VehicleAlarmMsg message = createVehicleAlarmMessage();
+        // 创建报警信息消息
+        AlarmInfoMsg message = createAlarmInfoMessage();
         
-        log.info("[客户端] 发送车辆报警消息...");
+        log.info("[客户端] 发送报警信息消息(1402)...");
         client.send(message);
         
         // 等待服务端接收
@@ -345,38 +346,39 @@ class JT809IntegrationTest {
         // 验证收到的消息内容
         BaseMessage received = lastReceivedMessage.get();
         assertNotNull(received, "收到的消息不应为空");
-        assertEquals(MessageType.VEHICLE_ALARM, received.getMsgId(), "消息ID应该匹配");
+        assertEquals(MessageType.ALARM_INFO_INTERACTION, received.getMsgId(), "消息ID应该匹配");
         
         // 验证报警信息内容
-        VehicleAlarmMsg alarmMsg = (VehicleAlarmMsg) received;
-        VehicleAlarmMsg.Body body = (VehicleAlarmMsg.Body) alarmMsg.getBody();
+        AlarmInfoMsg alarmInfoMsg = (AlarmInfoMsg) received;
+        AlarmInfoMsg.Body body = (AlarmInfoMsg.Body) alarmInfoMsg.getBody();
         assertNotNull(body, "消息体不应为空");
-        assertEquals("京A12345", body.getVehicleNo(), "车牌号应该匹配");
-        assertNotNull(body.getAlarmData(), "报警数据不应为空");
+        assertEquals(AlarmInfoMsg.SUB_BUSINESS_TYPE_1402, body.getSubBusinessType(), "子业务类型应该匹配");
         
-        VehicleAlarmMsg.AlarmData alarm = body.getAlarmData();
-        assertEquals(1, alarm.getAlarmSource(), "报警来源应该匹配");
-        assertEquals(0x00000001L, alarm.getAlarmType(), "报警类型应该匹配");
+        AlarmInfoMsg.AlarmReportData data = body.getAlarmReportData();
+        assertNotNull(data, "报警数据不应为空");
+        assertEquals("35010210178", data.getSourcePlatformId(), "发起平台编码应该匹配");
+        assertEquals(1, data.getAlarmType(), "报警类型应该匹配");
+        assertEquals("川SG5008", data.getVehicleNo(), "车牌号应该匹配");
+        assertEquals("超速报警", data.getInfoContent(), "信息内容应该匹配");
         
-        log.info("[测试] 车辆报警消息测试通过!");
+        log.info("[测试] 报警信息消息(1402)测试通过!");
     }
     
     @Test
     @Order(10)
-    @DisplayName("批量发送车辆报警消息测试")
-    void testSendMultipleAlarmMessages() throws Exception {
+    @DisplayName("批量发送报警信息消息测试")
+    void testSendMultipleAlarmInfoMessages() throws Exception {
         // 重置计数器
         messageReceivedCount.set(0);
         int messageCount = 5;
         
-        log.info("[客户端] 批量发送 {} 条报警消息...", messageCount);
+        log.info("[客户端] 批量发送 {} 条报警信息消息...", messageCount);
         
         for (int i = 0; i < messageCount; i++) {
-            VehicleAlarmMsg message = createVehicleAlarmMessage();
-            // 修改车牌号和报警类型区分每条消息
-            VehicleAlarmMsg.Body body = (VehicleAlarmMsg.Body) message.getBody();
-            body.setVehicleNo(String.format("京A%05d", i + 1));
-            body.getAlarmData().setAlarmType(1L << i); // 不同报警类型
+            AlarmInfoMsg message = createAlarmInfoMessage();
+            // 修改报警类型区分每条消息
+            AlarmInfoMsg.Body body = (AlarmInfoMsg.Body) message.getBody();
+            body.getAlarmReportData().setAlarmType(i + 1);
             client.send(message);
             
             // 短暂延迟
@@ -387,11 +389,11 @@ class JT809IntegrationTest {
         TimeUnit.SECONDS.sleep(2);
         
         int received = messageReceivedCount.get();
-        log.info("[服务端] 接收到 {} 条报警消息", received);
+        log.info("[服务端] 接收到 {} 条报警信息消息", received);
         
-        assertEquals(messageCount, received, "服务端应该收到所有报警消息");
+        assertEquals(messageCount, received, "服务端应该收到所有报警信息消息");
         
-        log.info("[测试] 批量报警消息测试通过!");
+        log.info("[测试] 批量报警信息消息测试通过!");
     }
 
     /**
@@ -441,50 +443,46 @@ class JT809IntegrationTest {
     }
 
     /**
-     * 创建车辆报警消息
+     * 创建报警信息消息(1402)
      */
-    private VehicleAlarmMsg createVehicleAlarmMessage() {
-        VehicleAlarmMsg message = new VehicleAlarmMsg();
-        VehicleAlarmMsg.Body body = new VehicleAlarmMsg.Body();
+    private AlarmInfoMsg createAlarmInfoMessage() {
+        AlarmInfoMsg message = new AlarmInfoMsg();
+        AlarmInfoMsg.Body body = new AlarmInfoMsg.Body();
         
-        // 车牌号
-        body.setVehicleNo("京A12345");
-        body.setVehicleColor(1); // 蓝色
-        
-        // 子业务类型：报警信息
-        body.setSubBusinessType(0x1401);
+        // 子业务类型
+        body.setSubBusinessType(AlarmInfoMsg.SUB_BUSINESS_TYPE_1402);
         
         // 创建报警数据
-        VehicleAlarmMsg.AlarmData alarmData = new VehicleAlarmMsg.AlarmData();
+        AlarmInfoMsg.AlarmReportData alarmData = new AlarmInfoMsg.AlarmReportData();
         
-        // 报警来源：车载终端
-        alarmData.setAlarmSource(1);
+        // 发起报警平台唯一编码
+        alarmData.setSourcePlatformId("35010210178");
         
-        // 报警类型：超速报警 (bit0)
-        alarmData.setAlarmType(0x00000001L);
+        // 报警类型：超速报警
+        alarmData.setAlarmType(1);
         
-        // 报警时间 (BCD格式: YYMMDDHHmmss)
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        alarmData.setAlarmTime(String.format("%02d%02d%02d%02d%02d%02d",
-            now.getYear() % 100, now.getMonthValue(), now.getDayOfMonth(),
-            now.getHour(), now.getMinute(), now.getSecond()));
+        // 报警时间（UTC时间戳）
+        long now = System.currentTimeMillis() / 1000;
+        alarmData.setAlarmTime(Instant.ofEpochSecond(now));
+        alarmData.setEventStartTime(Instant.ofEpochSecond(now));
+        alarmData.setEventEndTime(Instant.ofEpochSecond(now + 10)); // 10秒后结束
         
-        // 位置（北京天安门附近）
-        alarmData.setLongitude(116397499); // 116.397499° * 1e6
-        alarmData.setLatitude(39909356);   // 39.909356° * 1e6
+        // 车牌号码
+        alarmData.setVehicleNo("川SG5008");
         
-        // 速度和方向
-        alarmData.setSpeed(800); // 80 km/h (单位: 0.1 km/h)
-        alarmData.setDirection(90); // 向东
-        alarmData.setAltitude(50); // 海拔50米
+        // 车牌颜色：黄色
+        alarmData.setVehicleColor(2);
         
-        // 车辆状态
-        alarmData.setVehicleStatus(0);
+        // 被报警平台唯一编码
+        alarmData.setTargetPlatformId("35010210178");
         
-        // 报警描述
-        alarmData.setAlarmDesc("车辆超速报警");
+        // 线路ID
+        alarmData.setLineId(0);
         
-        body.setAlarmData(alarmData);
+        // 信息内容
+        alarmData.setInfoContent("超速报警");
+        
+        body.setAlarmReportData(alarmData);
         
         message.setBody(body);
         message.getHead().setPlatformId(PLATFORM_ID);
