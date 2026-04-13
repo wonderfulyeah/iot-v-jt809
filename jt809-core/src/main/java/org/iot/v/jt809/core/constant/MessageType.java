@@ -56,9 +56,15 @@ public interface MessageType {
     int ALARM_INFO_INTERACTION = 0x1400;
     
     /**
-     * 车辆报警信息
+     * 上报报警信息消息（子业务类型）
      */
-    int VEHICLE_ALARM = 0x1401;
+    int ALARM_REPORT_INFO = 0x1402;
+    
+    /**
+     * 主动上报报警处理结果消息（子业务类型）
+     */
+    int ALARM_REPORT_RESULT = 0x1412;
+
     
     /**
      * 车辆注册信息
@@ -101,11 +107,6 @@ public interface MessageType {
      * 车辆定位信息查询
      */
     int VEHICLE_LOCATION_QUERY = 0x9201;
-    
-    /**
-     * 车辆报警交互
-     */
-    int VEHICLE_ALARM_INTERACTION = 0x9401;
     
     /**
      * 车辆控制请求

@@ -151,4 +151,14 @@ class JT809DecoderTest {
         BaseMessage decoded = channel.readInbound();
         assertNotNull(decoded);
     }
+
+    @Test
+    @DisplayName("数据解码测试1412")
+    void decode1412() throws Exception {
+        String hex = "5b0000002f000016e31400000f424501000100000000000000000069d8ae8214120000000700000000000001b7b35d";
+        ByteBuf buf = Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(hex));
+        channel.writeInbound(buf);
+        BaseMessage decoded = channel.readInbound();
+        assertNotNull(decoded);
+    }
 }
