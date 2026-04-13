@@ -76,7 +76,7 @@ public class VehicleDynamicMsg extends BaseMessage {
         /**
          * 1202：实时上传车辆定位信息（单条）
          */
-        private VehicleLocationInfo2019 vehicleLocationInfo2019;
+        private VehicleLocationInfo vehicleLocationInfo;
         
         /**
          * 1203特有数据：车辆定位信息自动补报数据（多条）
@@ -94,8 +94,8 @@ public class VehicleDynamicMsg extends BaseMessage {
             
             if (subBusinessType == SUB_BUSINESS_TYPE_1203 && locationSupplementData != null) {
                 dataBytes = locationSupplementData.encode();
-            } else if (subBusinessType == SUB_BUSINESS_TYPE_1202 && vehicleLocationInfo2019 != null) {
-                dataBytes = vehicleLocationInfo2019.encode();
+            } else if (subBusinessType == SUB_BUSINESS_TYPE_1202 && vehicleLocationInfo != null) {
+                dataBytes = vehicleLocationInfo.encode();
             } else if (subBusinessType == SUB_BUSINESS_TYPE_1201 && vehicleRegistrationData != null) {
                 dataBytes = vehicleRegistrationData.encode();
             } else if (locationData != null) {
@@ -157,8 +157,8 @@ public class VehicleDynamicMsg extends BaseMessage {
                     locationSupplementData = new LocationSupplementData();
                     locationSupplementData.decode(dataBytes);
                 } else if (subBusinessType == SUB_BUSINESS_TYPE_1202) {
-                    vehicleLocationInfo2019 = new VehicleLocationInfo2019();
-                    vehicleLocationInfo2019.decode(Unpooled.wrappedBuffer(dataBytes));
+                    vehicleLocationInfo = new VehicleLocationInfo();
+                    vehicleLocationInfo.decode(Unpooled.wrappedBuffer(dataBytes));
                 } else if (subBusinessType == SUB_BUSINESS_TYPE_1201) {
                     vehicleRegistrationData = new VehicleRegistrationData();
                     vehicleRegistrationData.decode(dataBytes);
@@ -311,7 +311,7 @@ public class VehicleDynamicMsg extends BaseMessage {
         /**
          * 定位数据列表
          */
-        private List<VehicleLocationInfo2019> locationList;
+        private List<VehicleLocationInfo> locationList;
         
         public byte[] encode() {
             if (locationList == null || locationList.isEmpty()) {
@@ -320,7 +320,7 @@ public class VehicleDynamicMsg extends BaseMessage {
             
             // 计算总长度
             int dataLength = 1; // locationCount
-            for (VehicleLocationInfo2019 info : locationList) {
+            for (VehicleLocationInfo info : locationList) {
                 dataLength += info.calculateEncodeLength();
             }
             
@@ -330,7 +330,7 @@ public class VehicleDynamicMsg extends BaseMessage {
             buf.writeByte(locationList.size());
             
             // 定位数据列表
-            for (VehicleLocationInfo2019 info : locationList) {
+            for (VehicleLocationInfo info : locationList) {
                 byte[] infoBytes = info.encode();
                 buf.writeBytes(infoBytes);
             }
@@ -351,7 +351,7 @@ public class VehicleDynamicMsg extends BaseMessage {
             // 定位数据列表
             locationList = new ArrayList<>();
  for (int i = 0; i < locationCount; i++) {
-                VehicleLocationInfo2019 info = new VehicleLocationInfo2019();
+                VehicleLocationInfo info = new VehicleLocationInfo();
                 info.decode(buf);
                 locationList.add(info);
             }
@@ -364,7 +364,7 @@ public class VehicleDynamicMsg extends BaseMessage {
      * 车辆定位信息（2019版）
      */
     @Data
-    public static class VehicleLocationInfo2019 {
+    public static class VehicleLocationInfo {
         
         /**
          * 是否使用国家测绘局批准的地图保密插件进行加密（1字节）
