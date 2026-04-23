@@ -65,7 +65,17 @@ public interface MessageType {
      */
     int ALARM_REPORT_RESULT = 0x1412;
 
-    
+    /**
+     * 主链路车辆监管消息
+     */
+    int VEHICLE_MONITOR = 0x1500;
+
+    /**
+     * 车辆拍照应答（子业务类型）
+     */
+    int PHOTO_RESPONSE = 0x1502;
+
+
     /**
      * 车辆注册信息
      */

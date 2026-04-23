@@ -49,6 +49,9 @@ public class MessageTypeRegistry {
         // 注册下行车辆消息
         register(MessageType.VEHICLE_LOCATION_QUERY, VehicleLocationQueryReq.class);
         register(MessageType.VEHICLE_CONTROL, VehicleControlReq.class);
+
+        // 注册主链路车辆监管消息
+        register(MessageType.VEHICLE_MONITOR, VehicleMonitorMsg.class);
     }
     
     /**
