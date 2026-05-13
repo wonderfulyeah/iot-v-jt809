@@ -122,7 +122,7 @@ public class JT809Decoder extends ByteToMessageDecoder {
             try {
                 message = MessageTypeRegistry.createMessage(head.getMsgId());
             } catch (IllegalArgumentException e) {
-                log.error("Unsupported Message Type,type:{},raw:{}", Integer.toHexString(head.getMsgId()), rawData, e);
+                log.debug("Unsupported Message Type,type:{},raw:{}", Integer.toHexString(head.getMsgId()), rawData, e);
                 return;
             }
             message.setHead(head);
