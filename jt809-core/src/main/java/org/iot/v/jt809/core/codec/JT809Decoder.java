@@ -1,5 +1,6 @@
 package org.iot.v.jt809.core.codec;
 
+import com.alibaba.fastjson2.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -144,8 +145,10 @@ public class JT809Decoder extends ByteToMessageDecoder {
             // 14. 释放临时ByteBuf
             ReferenceCountUtil.release(originalMessage);
 
-            log.debug("Decoded message: msgId=0x{}, msgSn={}",
-                    Integer.toHexString(head.getMsgId()), head.getMsgSn());
+            if (log.isDebugEnabled()) {
+                log.debug("Decoded message: raw data: {} \n result: {}",
+                        rawData, JSON.toJSONString(message));
+            }
 
         } catch (Exception e) {
             log.error("Decode message failed,raw data: {}", rawData, e);
