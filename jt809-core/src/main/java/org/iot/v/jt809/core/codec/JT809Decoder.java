@@ -86,8 +86,6 @@ public class JT809Decoder extends ByteToMessageDecoder {
                 log.warn("Message length mismatch: declared={}, actual={}",
                         declaredLength, actualLength);
                 ReferenceCountUtil.release(originalMessage);
-                // 跳过结束标识
-                in.skipBytes(1);
                 return;
             }
 
@@ -110,8 +108,6 @@ public class JT809Decoder extends ByteToMessageDecoder {
                         Integer.toHexString(calculatedCrc).toUpperCase(),
                         Integer.toHexString(receivedCrc).toUpperCase());
                 ReferenceCountUtil.release(originalMessage);
-                // 跳过结束标识
-                in.skipBytes(1);
                 return;
             }
 

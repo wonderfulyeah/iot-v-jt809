@@ -7,6 +7,9 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.iot.v.jt809.core.constant.JT809Constant;
 import org.iot.v.jt809.core.constant.MessageType;
 import org.iot.v.jt809.core.message.base.BaseMessage;
+import org.iot.v.jt809.core.message.base.MessageHead;
+import org.iot.v.jt809.core.message.base.ProtocolVersion;
+import org.iot.v.jt809.core.message.upstream.UpLinkTestReq;
 import org.iot.v.jt809.core.message.upstream.vehicle.AlarmInfoMsg;
 import org.iot.v.jt809.core.util.BCDUtil;
 import org.iot.v.jt809.core.util.CRCUtil;
@@ -113,6 +116,42 @@ class JT809DecoderTest {
     }
 
     @Test
+    @DisplayName("解码粘包消息-同一缓冲区多条消息")
+    void testDecodeStickyMessages() {
+        ByteBuf first = encodeUpLinkTestReq(1);
+        ByteBuf second = encodeUpLinkTestReq(2);
+        ByteBuf sticky = Unpooled.wrappedBuffer(first, second);
+
+        channel.writeInbound(sticky);
+
+        BaseMessage firstDecoded = channel.readInbound();
+        BaseMessage secondDecoded = channel.readInbound();
+
+        assertNotNull(firstDecoded);
+        assertNotNull(secondDecoded);
+        assertEquals(1, firstDecoded.getMsgSn());
+        assertEquals(2, secondDecoded.getMsgSn());
+        assertNull(channel.readInbound());
+    }
+
+    @Test
+    @DisplayName("解码异常消息后继续接收后续正常消息")
+    void testDecodeValidMessageAfterInvalidCrcMessage() {
+        ByteBuf invalid = encodeUpLinkTestReq(1);
+        invalid.setByte(invalid.writerIndex() - 2, invalid.getByte(invalid.writerIndex() - 2) ^ 0x01);
+        ByteBuf valid = encodeUpLinkTestReq(2);
+        ByteBuf input = Unpooled.wrappedBuffer(invalid, valid);
+
+        channel.writeInbound(input);
+
+        BaseMessage decoded = channel.readInbound();
+
+        assertNotNull(decoded);
+        assertEquals(2, decoded.getMsgSn());
+        assertNull(channel.readInbound());
+    }
+
+    @Test
     @DisplayName("数据解码测试1202")
     void decode1202() throws Exception {
         String hex = "5b0000009d000817341200000f424401000100000000000000000069d77403b4a8534636313036000000000000000000000000000212020000005f000000002d00000000004c000301d879eb067aeff900b2020800322604091737400104001031b60202000003020208310118333530313032313031373800000000000000000000000000000000000000000000000000000000000000000000b8ca5d5b0000009d000817351200000f424401000100000000000000000069d77403b4a8534439353237000000000000000000000000000212020000005f000000002d000000000008000301d5fa3a066085be00ff0000010e26040917374101040001885e020202000003020000310111333530313032313031373800000000000000000000000000000000000000000000000000000000000000000000030b5d5b0000009d000817361200000f424401000100000000000000000069d77403b4a8534638363936000000000000000000000000000212020000005f000000002d000000000048000301d9fe7d067254c600fc01ae00592604091737410104000ee92b02020000030201c2310113333530313032313031373800000000000000000000000000000000000000000000000000000000000000000000b6b65d5b0000009d000817371200000f424401000100000000000000000069d77403b4a8533835303638440000000000000000000000005e0112020000005f000000002d000000000008600301d5e4cb0660bd0000ce00000000260409173727010400086d4e0202000003020000310106333530313032313031373800000000000000000000000000000000000000000000000000000000000000000000fba05d";
@@ -160,5 +199,23 @@ class JT809DecoderTest {
         channel.writeInbound(buf);
         BaseMessage decoded = channel.readInbound();
         assertNotNull(decoded);
+    }
+
+    private ByteBuf encodeUpLinkTestReq(int msgSn) {
+        EmbeddedChannel encodeChannel = new EmbeddedChannel(new JT809Encoder());
+        UpLinkTestReq msg = new UpLinkTestReq();
+        MessageHead head = msg.getHead();
+        head.setMsgSn(msgSn);
+        head.setPlatformId(1000001L);
+        head.setVersion(new ProtocolVersion((byte) 1, (byte) 0, (byte) 0));
+        head.setEncrypt((byte) 0);
+        head.setEncryptKey(0L);
+
+        assertTrue(encodeChannel.writeOutbound(msg));
+        assertTrue(encodeChannel.finish());
+
+        ByteBuf encoded = encodeChannel.readOutbound();
+        assertNotNull(encoded);
+        return encoded;
     }
 }
