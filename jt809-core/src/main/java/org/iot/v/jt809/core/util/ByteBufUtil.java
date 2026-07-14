@@ -108,7 +108,7 @@ public class ByteBufUtil {
     public static void writeString(ByteBuf buf, String str, int length) {
         byte[] bytes = new byte[length];
         if (str != null) {
-            byte[] strBytes = str.getBytes();
+            byte[] strBytes = str.getBytes(Charset.forName("GBK"));
             int copyLen = Math.min(strBytes.length, length);
             System.arraycopy(strBytes, 0, bytes, 0, copyLen);
         }

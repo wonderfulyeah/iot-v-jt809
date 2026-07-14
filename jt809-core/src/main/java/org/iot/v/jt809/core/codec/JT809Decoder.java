@@ -146,6 +146,8 @@ public class JT809Decoder extends ByteToMessageDecoder {
                         rawData, JSON.toJSONString(message));
             }
 
+        } catch (IllegalArgumentException e) {
+            log.trace("Decode message failed,raw data: {}", rawData, e);
         } catch (Exception e) {
             log.error("Decode message failed,raw data: {}", rawData, e);
         }

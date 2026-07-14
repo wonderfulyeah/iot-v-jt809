@@ -47,6 +47,7 @@ public class MessageTypeRegistry {
         register(MessageType.DOWN_LINK_TEST_RESP, DownLinkTestResp.class);
         
         // 注册下行车辆消息
+        register(MessageType.DOWN_EXG_MSG, DownVehicleDynamicMsg.class);
         register(MessageType.VEHICLE_LOCATION_QUERY, VehicleLocationQueryReq.class);
         register(MessageType.VEHICLE_CONTROL, VehicleControlReq.class);
 

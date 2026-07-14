@@ -117,6 +117,11 @@ public interface MessageType {
      * 车辆定位信息查询
      */
     int VEHICLE_LOCATION_QUERY = 0x9201;
+
+    /**
+     * 从链路动态信息交换消息
+     */
+    int DOWN_EXG_MSG = 0x9200;
     
     /**
      * 车辆控制请求

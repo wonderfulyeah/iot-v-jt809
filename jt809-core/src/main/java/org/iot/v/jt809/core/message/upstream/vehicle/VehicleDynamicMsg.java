@@ -31,6 +31,8 @@ public class VehicleDynamicMsg extends BaseMessage {
     public static final int SUB_BUSINESS_TYPE_1201 = 0x1201;
     public static final int SUB_BUSINESS_TYPE_1202 = 0x1202;
     public static final int SUB_BUSINESS_TYPE_1203 = 0x1203;
+    public static final int SUB_BUSINESS_TYPE_120A = 0x120A;
+    public static final int SUB_BUSINESS_TYPE_120C = 0x120C;
 
     public VehicleDynamicMsg() {
         setMsgId(MessageType.VEHICLE_LOCATION);
@@ -84,6 +86,16 @@ public class VehicleDynamicMsg extends BaseMessage {
          */
         private VehicleRegistrationData vehicleRegistrationData;
 
+        /**
+         * 120A：上报驾驶员身份信息应答
+         */
+        private DriverInfoAckData driverInfoAckData;
+
+        /**
+         * 120C：主动上报驾驶员身份信息
+         */
+        private DriverInfoReportData driverInfoReportData;
+
         @Override
         public byte[] encode() {
             byte[] dataBytes;
@@ -94,6 +106,10 @@ public class VehicleDynamicMsg extends BaseMessage {
                 dataBytes = vehicleLocationInfo.encode();
             } else if (subBusinessType == SUB_BUSINESS_TYPE_1201 && vehicleRegistrationData != null) {
                 dataBytes = vehicleRegistrationData.encode();
+            } else if (subBusinessType == SUB_BUSINESS_TYPE_120A && driverInfoAckData != null) {
+                dataBytes = driverInfoAckData.encode();
+            } else if (subBusinessType == SUB_BUSINESS_TYPE_120C && driverInfoReportData != null) {
+                dataBytes = driverInfoReportData.encode();
             } else {
                 dataBytes = new byte[0];
             }
@@ -156,12 +172,130 @@ public class VehicleDynamicMsg extends BaseMessage {
                 } else if (subBusinessType == SUB_BUSINESS_TYPE_1201) {
                     vehicleRegistrationData = new VehicleRegistrationData();
                     vehicleRegistrationData.decode(dataBytes);
+                } else if (subBusinessType == SUB_BUSINESS_TYPE_120A) {
+                    driverInfoAckData = new DriverInfoAckData();
+                    driverInfoAckData.decode(dataBytes);
+                } else if (subBusinessType == SUB_BUSINESS_TYPE_120C) {
+                    driverInfoReportData = new DriverInfoReportData();
+                    driverInfoReportData.decode(dataBytes);
                 } else {
                     throw new IllegalArgumentException("Unknown sub businessType type: 0x" +
                             Integer.toHexString(subBusinessType).toUpperCase());
                 }
             }
 
+            buf.release();
+        }
+    }
+
+    /**
+     * 驾驶员身份信息公共数据。
+     */
+    @Data
+    public static class DriverInfoData {
+
+        /**
+         * 驾驶员姓名（16字节）
+         */
+        private String driverName;
+
+        /**
+         * 驾驶证编号（20字节）
+         */
+        private String driverId;
+
+        /**
+         * 从业资格证号
+         */
+        private String licence;
+
+        /**
+         * 发证机构名称（200字节）
+         */
+        private String orgName;
+
+        /**
+         * 证件有效期（8字节 time_t，时分秒为0）
+         */
+        private long validDate;
+
+        protected void encodeTo(ByteBuf buf, int licenceLength) {
+            ByteBufUtil.writeString(buf, driverName, 16);
+            ByteBufUtil.writeString(buf, driverId, 20);
+            ByteBufUtil.writeString(buf, licence, licenceLength);
+            ByteBufUtil.writeString(buf, orgName, 200);
+            buf.writeLong(validDate);
+        }
+
+        protected void decodeFrom(ByteBuf buf, int licenceLength) {
+            driverName = ByteBufUtil.readString(buf, 16);
+            driverId = ByteBufUtil.readString(buf, 20);
+            licence = ByteBufUtil.readString(buf, licenceLength);
+            orgName = ByteBufUtil.readString(buf, 200);
+            validDate = buf.readLong();
+        }
+    }
+
+    /**
+     * 120A：上报驾驶员身份信息应答数据。
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    public static class DriverInfoAckData extends DriverInfoData {
+
+        /**
+         * 对应上报驾驶员身份请求消息源子业务类型标识（2字节）
+         */
+        private int sourceSubBusinessType;
+
+        /**
+         * 对应上报驾驶员身份请求消息源报文序列号（4字节）
+         */
+        private long sourceMsgSn;
+
+        public byte[] encode() {
+            ByteBuf buf = Unpooled.buffer(2 + 4 + 16 + 20 + 40 + 200 + 8);
+            buf.writeShort(sourceSubBusinessType);
+            buf.writeInt((int) sourceMsgSn);
+            encodeTo(buf, 40);
+
+            byte[] result = new byte[buf.readableBytes()];
+            buf.readBytes(result);
+            buf.release();
+
+            return result;
+        }
+
+        public void decode(byte[] data) {
+            ByteBuf buf = Unpooled.wrappedBuffer(data);
+            sourceSubBusinessType = buf.readUnsignedShort();
+            sourceMsgSn = buf.readUnsignedInt();
+            decodeFrom(buf, 40);
+            buf.release();
+        }
+    }
+
+    /**
+     * 120C：主动上报驾驶员身份信息数据。
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = true)
+    public static class DriverInfoReportData extends DriverInfoData {
+
+        public byte[] encode() {
+            ByteBuf buf = Unpooled.buffer(16 + 20 + 20 + 200 + 8);
+            encodeTo(buf, 20);
+
+            byte[] result = new byte[buf.readableBytes()];
+            buf.readBytes(result);
+            buf.release();
+
+            return result;
+        }
+
+        public void decode(byte[] data) {
+            ByteBuf buf = Unpooled.wrappedBuffer(data);
+            decodeFrom(buf, 20);
             buf.release();
         }
     }
